@@ -70,22 +70,54 @@ export default function BookingScreen() {
 }
 
   async function toggleSavedHotel(hotel) {
-    // TODO 8:
-    // If hotel is already saved, remove it.
-    // Otherwise add it.
-    // Update React state and AsyncStorage using the SAME updated array.
+  try {
+    setStorageError('');
+
+    const alreadySaved = savedHotels.some(
+      (savedHotel) => savedHotel.id === hotel.id
+    );
+
+    const updatedHotels = alreadySaved
+      ? savedHotels.filter(
+          (savedHotel) => savedHotel.id !== hotel.id
+        )
+      : [...savedHotels, hotel];
+
+    setSavedHotels(updatedHotels);
+    await saveHotels(updatedHotels);
+  } catch (error) {
+    console.error('Failed to update saved hotels:', error);
+    setStorageError('Unable to update your saved hotels.');
   }
+}
 
   async function removeSavedHotel(hotelId) {
-    // TODO 9:
-    // Remove only the selected hotel from savedHotels.
-    // Update state and storage.
+  try {
+    setStorageError('');
+
+    const updatedHotels = savedHotels.filter(
+      (hotel) => hotel.id !== hotelId
+    );
+
+    setSavedHotels(updatedHotels);
+    await saveHotels(updatedHotels);
+  } catch (error) {
+    console.error('Failed to remove saved hotel:', error);
+    setStorageError('Unable to remove the saved hotel.');
   }
+}
 
   async function clearAllSavedHotels() {
-    // TODO 10:
-    // Remove only the saved-hotels storage key and set state to [].
+  try {
+    setStorageError('');
+
+    await clearSavedHotels();
+    setSavedHotels([]);
+  } catch (error) {
+    console.error('Failed to clear saved hotels:', error);
+    setStorageError('Unable to clear your saved hotels.');
   }
+}
 
   const isSaved = (hotelId) =>
     savedHotels.some((hotel) => hotel.id === hotelId);
