@@ -58,9 +58,16 @@ export default function BookingScreen() {
   );
 
   async function handleSelectCity(cityId) {
-    // TODO 7:
-    // Update selectedCityId and persist the selected city.
+  try {
+    setStorageError('');
+
+    setSelectedCityId(cityId);
+    await saveSelectedCity(cityId);
+  } catch (error) {
+    console.error('Failed to save selected city:', error);
+    setStorageError('Unable to save your selected city.');
   }
+}
 
   async function toggleSavedHotel(hotel) {
     // TODO 8:
