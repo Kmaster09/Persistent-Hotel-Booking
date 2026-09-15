@@ -32,6 +32,26 @@ export default function BookingScreen() {
   // TODO 6:
   // Restore BOTH saved hotels and selected city when this screen loads.
   // Use try/catch/finally and end with isLoading false.
+  useEffect(() => {
+    async function restoreTravelData() {
+      try {
+        setStorageError('');
+
+        const restoredHotels = await loadHotels();
+        const restoredCity = await loadSelectedCity();
+
+        setSavedHotels(restoredHotels);
+        setSelectedCityId(restoredCity);
+      } catch (error) {
+        console.error('Failed to restore travel data:', error);
+        setStorageError('Unable to restore your saved travel data.');
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    restoreTravelData();
+  }, []);
 
   const visibleHotels = hotels.filter(
     (hotel) => hotel.cityId === selectedCityId
@@ -67,8 +87,12 @@ export default function BookingScreen() {
     return (
       <View style={styles.loading}>
         <ActivityIndicator size="large" />
-        <Text style={styles.loadingTitle}>Loading your saved stays...</Text>
-        <Text style={styles.loadingText}>StayFinder is restoring local travel data.</Text>
+        <Text style={styles.loadingTitle}>
+          Loading your saved stays...
+        </Text>
+        <Text style={styles.loadingText}>
+          StayFinder is restoring local travel data.
+        </Text>
       </View>
     );
   }
@@ -78,17 +102,46 @@ export default function BookingScreen() {
       <BookingHeader savedCount={savedHotels.length} />
 
       <View style={styles.tabs}>
-        <Pressable onPress={() => setActiveTab('stays')} style={[styles.tab, activeTab === 'stays' && styles.tabActive]}>
-          <Text style={[styles.tabText, activeTab === 'stays' && styles.tabTextActive]}>Stays</Text>
+        <Pressable
+          onPress={() => setActiveTab('stays')}
+          style={[
+            styles.tab,
+            activeTab === 'stays' && styles.tabActive,
+          ]}
+        >
+          <Text
+            style={[
+              styles.tabText,
+              activeTab === 'stays' && styles.tabTextActive,
+            ]}
+          >
+            Stays
+          </Text>
         </Pressable>
-        <Pressable onPress={() => setActiveTab('saved')} style={[styles.tab, activeTab === 'saved' && styles.tabActive]}>
-          <Text style={[styles.tabText, activeTab === 'saved' && styles.tabTextActive]}>Saved ({savedHotels.length})</Text>
+
+        <Pressable
+          onPress={() => setActiveTab('saved')}
+          style={[
+            styles.tab,
+            activeTab === 'saved' && styles.tabActive,
+          ]}
+        >
+          <Text
+            style={[
+              styles.tabText,
+              activeTab === 'saved' && styles.tabTextActive,
+            ]}
+          >
+            Saved ({savedHotels.length})
+          </Text>
         </Pressable>
       </View>
 
       {storageError !== '' && (
         <View style={styles.errorBanner}>
-          <Text style={styles.errorText}>{storageError}</Text>
+          <Text style={styles.errorText}>
+            {storageError}
+          </Text>
         </View>
       )}
 
@@ -112,8 +165,15 @@ export default function BookingScreen() {
               />
 
               <View style={styles.resultsHeader}>
-                <Text style={styles.resultsTitle}>Places to stay</Text>
-                <Text style={styles.resultsText}>Compare two starter properties in each city, then replace all placeholder images with accurate real-city and real-hotel photos.</Text>
+                <Text style={styles.resultsTitle}>
+                  Places to stay
+                </Text>
+
+                <Text style={styles.resultsText}>
+                  Compare two starter properties in each city,
+                  then replace all placeholder images with
+                  accurate real-city and real-hotel photos.
+                </Text>
               </View>
             </View>
           }
@@ -132,18 +192,91 @@ export default function BookingScreen() {
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#fff' },
-  loading: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24, backgroundColor: '#fff' },
-  loadingTitle: { marginTop: 14, color: '#0f172a', fontSize: 18, fontWeight: '900' },
-  loadingText: { marginTop: 6, color: '#64748b', textAlign: 'center' },
-  tabs: { flexDirection: 'row', paddingHorizontal: 16, borderBottomWidth: 1, borderBottomColor: '#dbe3ee', backgroundColor: '#fff' },
-  tab: { marginRight: 24, paddingVertical: 12, borderBottomWidth: 3, borderBottomColor: 'transparent' },
-  tabActive: { borderBottomColor: '#006ce4' },
-  tabText: { color: '#64748b', fontWeight: '800' },
-  tabTextActive: { color: '#0057b8' },
-  errorBanner: { backgroundColor: '#fff1f2', borderBottomWidth: 1, borderBottomColor: '#fecdd3', paddingHorizontal: 16, paddingVertical: 10 },
-  errorText: { color: '#9f1239', fontWeight: '700' },
-  resultsHeader: { paddingHorizontal: 16, paddingTop: 20, paddingBottom: 8, backgroundColor: '#fff' },
-  resultsTitle: { color: '#0f172a', fontSize: 24, fontWeight: '900', letterSpacing: -0.7 },
-  resultsText: { marginTop: 6, color: '#64748b', lineHeight: 20, fontSize: 13 },
+  screen: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+
+  loading: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 24,
+    backgroundColor: '#fff',
+  },
+
+  loadingTitle: {
+    marginTop: 14,
+    color: '#0f172a',
+    fontSize: 18,
+    fontWeight: '900',
+  },
+
+  loadingText: {
+    marginTop: 6,
+    color: '#64748b',
+    textAlign: 'center',
+  },
+
+  tabs: {
+    flexDirection: 'row',
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#dbe3ee',
+    backgroundColor: '#fff',
+  },
+
+  tab: {
+    marginRight: 24,
+    paddingVertical: 12,
+    borderBottomWidth: 3,
+    borderBottomColor: 'transparent',
+  },
+
+  tabActive: {
+    borderBottomColor: '#006ce4',
+  },
+
+  tabText: {
+    color: '#64748b',
+    fontWeight: '800',
+  },
+
+  tabTextActive: {
+    color: '#0057b8',
+  },
+
+  errorBanner: {
+    backgroundColor: '#fff1f2',
+    borderBottomWidth: 1,
+    borderBottomColor: '#fecdd3',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+  },
+
+  errorText: {
+    color: '#9f1239',
+    fontWeight: '700',
+  },
+
+  resultsHeader: {
+    paddingHorizontal: 16,
+    paddingTop: 20,
+    paddingBottom: 8,
+    backgroundColor: '#fff',
+  },
+
+  resultsTitle: {
+    color: '#0f172a',
+    fontSize: 24,
+    fontWeight: '900',
+    letterSpacing: -0.7,
+  },
+
+  resultsText: {
+    marginTop: 6,
+    color: '#64748b',
+    lineHeight: 20,
+    fontSize: 13,
+  },
 });
